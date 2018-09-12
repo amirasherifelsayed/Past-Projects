@@ -1,0 +1,1 @@
+E:\XAMPP\mysql\bin\mysql.exe -u root -p plan3_drupal < "E:\db\plan3_drupal_2018-08-20_22-01-15.sql\plan3_drupal_2018-08-20_22-01-15.sql"

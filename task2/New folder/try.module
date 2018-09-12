@@ -1,0 +1,145 @@
+<?php
+
+function api_menu() {
+    $items = array();
+    $items['api/user/forgetpwd'] = array(
+        'page callback' => 'api_forget_pwd',
+        'access arguments' => array('access content'),
+        'delivery callback' => 'drupal_json_output',
+        'access callback' => true,
+        'type' => MENU_CALLBACK,
+   );
+   
+    $items['api/user/verifycode'] = array(
+        'page callback' => 'api_verify_code',
+        'access arguments' => array('access content'),
+        'delivery callback' => 'drupal_json_output',
+        'access callback' => true,
+        'type' => MENU_CALLBACK,
+    );
+    $items['api/user/resetpwd'] = array(
+        'page callback' => 'api_reset_pwd',
+        'access arguments' => array('access content'),
+        'delivery callback' => 'drupal_json_output',
+        'access callback' => true,
+        'type' => MENU_CALLBACK,
+    );
+    return $items;
+}
+
+function api_forget_pwd(){
+    $output = array();
+    $errors = array();
+    $inputs = json_decode(file_get_contents('php://input'), true);
+    $email = check_plain($inputs['email']);
+   
+
+    if (empty($email)) {
+        $errors['email'] = array('status' => 0, 'msg' => t('Empty Email'));
+    }
+
+    if (!$errors['email']) {
+        $account = user_load_by_mail($email);
+        if ($account) {
+        
+        $verification_code = planindo_change_user_verification_code($uid);
+        $user_data = user_load($uid);
+        $name = $user_data->name;
+
+        $emailsubject = variable_get('site_name') . ' | Forgot password ';
+
+        $message = '<p>' . __('Hello') . ' ' . $name . ',' . __('please use the following verficaiton code to reset your password') .$verification_code.'</p>';
+            
+
+
+            $to = $user_data->email; 
+            $from = "";  
+            $params = array(
+                'subject' => $emailsubject,
+                'body' => $message,
+            );
+ 
+           drupal_mail('api', 'forgetpwd', $to, language_default(), $params, $from);
+  
+        } 
+        
+
+        } else {
+            $errors['email'] = array('status' => 0, 'msg' => t('User not exist'));
+        }
+    if ($errors) {
+        $output['success'] = 0;
+        $output['errors'] = $errors;
+        drupal_add_http_header('status', 401);
+    }
+    return $output;
+}
+
+
+
+function api_verify_code() {
+	$output = array();
+    $errors = array();
+    $inputs = json_decode(file_get_contents('php://input'), true);
+    $code = check_plain($inputs['code']);
+
+    if (empty($code)) {
+        $errors['code'] = array('status' => 0, 'msg' => t('No code provided.'));
+    }
+
+    if (!$errors['code']) {
+       
+        $user_data = user_load($uid);
+        $db_code = $user_data->verification_code;
+
+          if($db_code === $code){
+
+                api_reset_pwd();
+
+          }else {
+
+          	$errors['code'] = array('status' => 0, 'msg' => t('Incorrect Verification code.'));
+
+          }
+
+        } else {
+            $errors['code'] = array('status' => 0, 'msg' => t('Incorrect Verification code.'));
+        }
+
+    if ($errors) {
+        $output['success'] = 0;
+        $output['errors'] = $errors;
+        drupal_add_http_header('status', 401);
+    }
+    return $output;
+
+    /*
+    $now_seconds = time();
+    $valid_for = 3600;
+    $expire = $now_seconds + $valid_for;
+    */
+}
+
+
+
+function api_reset_pwd() {
+
+	$output = array();
+    $errors = array();
+    $inputs = json_decode(file_get_contents('php://input'), true);
+    $new_password = check_plain($inputs['new_password']);
+    $confirm_password = check_plain($inputs['new_password']);
+
+    if (empty($new_password)) {
+        $errors['new_password'] = array('status' => 0, 'msg' => t('No password provided.'));
+    }
+    if(empty($confirm_password)) {
+        $errors['confirm_password'] = array('status' => 0, 'msg' => t('Please confirm your new password.'));
+    }
+
+    if (!$errors['new_password'] || !$errors['new_password'] ) {
+
+
+
+
+}

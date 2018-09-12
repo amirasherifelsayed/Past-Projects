@@ -1,0 +1,11 @@
+amiraapi/user/forgetpawd
+load_by_email
+
+amiraapi/user/verifycode
+
+amiraapi/user/resetpawd
+
+inputs {
+    new_pass
+    email
+}

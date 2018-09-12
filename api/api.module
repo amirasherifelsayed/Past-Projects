@@ -1,0 +1,93 @@
+<?php
+
+function api_menu() {
+  $items = array();
+  $items['api/form'] = array(
+    'title' => '',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('api_user_login'),
+    'access arguments' => array('access content'),
+    //'delivery callback' => 'drupal_json_output',
+    'description' => '',
+    'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+function api_user_login($form, &$form_state) {
+$form['login'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Login'),
+    '#collapsible' => TRUE, // Added
+    '#collapsed' => FALSE,  // Added
+  );
+  
+  $form['login']['email'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Email'),
+  );
+  $form['login']['password'] = array(
+    '#type' => 'password',
+    '#title' => t('Password'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+    '#submit' => array('api_form_submit'),
+  );
+  return $form;
+}
+
+
+
+function api_form_submit($form, &$form_state){
+    $output = array('success' => 0);
+	$email = $form_state['values']['email'];
+	$pass  = $form_state['values']['password'];
+
+    if (!$email && !$pass)
+	{
+	     $output['errors'][] = 'Please enter your email and password.';}
+
+    else if (!$email) {
+         $output['errors'][] = 'Please enter your email.';
+   
+	}
+	else if (!$pass) {
+	     $output['errors'][] = 'Please enter your password.';
+	}
+	
+	if(!$output['errors']){
+
+		$account = 	user_load_by_name($email);
+		if (!$account) {
+			$account = 	user_load_by_mail($email);
+		}
+		if ($account){
+			module_load_include('inc', 'content', 'includes/password');
+			$check_pass = user_check_password($pass, $account);
+			if ($check_pass) {
+				$output['success'] = 1;
+				$output['msg'] = 'Logged in successfuly';
+				$output['user'] = array(
+									'uid'       => (int) $account->uid,
+									'user_name' =>  $account->name,
+									'email' =>  $account->mail,
+									'first_name' =>  $account->field_first_name['und'][0]['value'],
+									'last_name' =>  $account->field_last_name['und'][0]['value'],
+								  );
+			} else {
+				//$output['success'] = 0;
+				$output['errors'][] = 'Invlaid Password';
+			}
+		} else {
+			$output['errors'][] = 'User not exist';
+		}
+
+	}
+
+	print drupal_json_output($output);
+	exit;
+}
+
+?>

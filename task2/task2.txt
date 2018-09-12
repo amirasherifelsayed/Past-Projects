@@ -1,0 +1,20 @@
+-posts    [news - articles]
+-comments
+-users
+
+@pages
+  -user register
+  -user login
+  -list of articles
+  -add article
+  -comment form on article [box below single article]
+  -list of comment below single article
+
+@Notices:
+  -user can not add article unless login
+  -user can not add comment unless login
+  -article list page will have pagination
+  -article add form will contain image
+  -when add or upload image from article form use plugin for thumbnails
+  
+  

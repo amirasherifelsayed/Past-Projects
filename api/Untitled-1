@@ -1,0 +1,26 @@
+/*
+$node_ids[] = $i->nid;
+
+$result = node_load_multiple($node_ids);
+
+
+$node = node_load(15);
+return $node;
+
+$new_result[] = array(
+                    'nid',
+                    'title',
+                    'description'
+                    'created'
+                )
+*/
+
+
+           /*
+           
+               $query->leftjoin('field_data_field_image', 'x', 't.entity_id = x.entity_id ');
+ //   $query->join('file_managed', 'y', 'x.field_image_fid = y.fid');
+           ->fields('n', array('nid','type', 'title', 'created'))
+           ->fields('t', array('entity_type', 'bundle', 'entity_id', 'field_tags_tid'))
+           ->fields('x', array('field_image_title'))
+         ->fields('y', array('fid', 'field_image_title', 'uri'))*/
